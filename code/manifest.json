@@ -1,0 +1,16 @@
+{
+	"name" : "noreferrer link",
+	"version" : "0.1",
+	"minimum_chrome_version" : "8",
+	"description" : "noreferrer linkは、リンクをクリックした際のリファラを遮断するための拡張です",
+	"background_page" : "background.html",
+	"options_page" : "option.html",
+	"content_scripts" : [
+		{
+			"matches" : ["http://*/*", "https://*/*"],
+			"run_at" : "document_start",
+			"all_frames" : true,
+			"js" : ["content_script.js"]
+		}
+	]
+}

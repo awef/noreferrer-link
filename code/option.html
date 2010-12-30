@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>noreferrer link</title>
+		<style>
+html {
+	background-color: #777;
+	font-size: 14px;
+}
+body {
+	background-color: #eee;
+	color: #444;
+	
+	margin: 20px auto;
+	padding: 10px;
+	width: 600px;
+	
+	border-radius: 4px;
+}
+h1, h2 {
+	margin: 0 0 5px 0;
+	font-size: medium;
+	font-weight: normal;
+}
+h2, footer{
+	margin-top: 20px;
+}
+label {
+	cursor: pointer;
+}
+
+#rules {
+	background-color: #fff;
+	color: #444;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: small;
+}
+
+#rules {
+	margin: 0 0 3px 0;
+	padding: 0 5px;
+	list-style-type: none;
+}
+#rules li:not(:last-child) {
+	border-bottom: 1px solid #ddd;
+}
+#rules li {
+	overflow: hidden;
+}
+#rules li button {
+	opacity: 0;
+	-webkit-transition: opacity 100ms;
+}
+#rules li:hover button {
+	opacity: 1;
+}
+
+footer {
+	margin-top: 20px;
+	padding-top: 10px;
+	font-size: small;
+	border-top: 1px solid #bbb;
+}
+		</style>
+		<script>
+window.addEventListener("load", function(){
+	chrome.extension.sendRequest({type : "GET_CONFIG"}, function(config){
+		var config_data = config;
+		
+		var hoge = function(){
+			var ul = document.getElementById("rules");
+			ul.innerHTML = "";
+			
+			var li, button;
+			for(var key in config_data.site){
+				li = document.createElement("li");
+				li.setAttribute("data-key", key);
+				
+				li.appendChild(document.createTextNode(key + " へのリファラを" + {ALL : "常に遮断", DIFF_DOMAIN : "別ドメインの場合のみ遮断", OFF : "遮断しない"}[config_data.site[key]]));
+				
+				button = document.createElement("button");
+				button.innerText = "削除";
+				li.appendChild(button);
+				
+				ul.appendChild(li);
+			}
+		};
+		hoge();
+		
+		var config_update = function(){
+			hoge();
+			chrome.extension.sendRequest({type : "UPDATE_CONFIG", config : config_data});
+		};
+		
+		document.getElementById("rules").addEventListener("click", function(e){
+			if(e.target.nodeName === "BUTTON"){
+				var key = e.target.parentNode.getAttribute("data-key");
+				delete config_data.site[key];
+				
+				config_update();
+			}
+		}, false);
+		
+		document.querySelector("input[value=\"" + config_data.global + "\"]").checked = true;
+		
+		document.getElementById("globalrule").addEventListener("change", function(e){
+			if(e.target.name === "global"){
+				config_data.global = e.target.value;
+				config_update();
+			}
+		}, false);
+		
+		document.getElementById("add_rule").addEventListener("submit", function(e){
+			e.preventDefault();
+			
+			var key = this.domain.value.replace(/\s/g, "");
+			if(key === ""){
+				return;
+			}
+			
+			config_data.site[key] = this.rule.value;
+			config_update();
+			
+			this.domain.value = "";
+		});
+	});
+});
+chrome.extension.onRequest.addListener(function(req){
+	if(req.type === "UPDATE_CONFIG"){
+		location.reload();
+	}
+});
+		</script>
+	</head>
+	<body>
+		<h1>noreferrer link</h1>
+		<h2>基本設定</h2>
+		<form id="globalrule">
+			<label><input name="global" type="radio" value="ALL" />全てのリンクで遮断</label><br />
+			<label><input name="global" type="radio" value="DIFF_DOMAIN" />別ドメインへのリンクのみ遮断</label><br />
+			<label><input name="global" type="radio" value="OFF" />遮断しない</label>
+		</form>
+		<h2>例外設定</h2>
+		<ul id="rules"></ul>
+		<form id="add_rule">
+			<input name="domain" type="text" placeholder="example.com" />
+			へのリファラを
+			<select name="rule">
+				<option value="ALL">常に遮断</option>
+				<option value="DIFF_DOMAIN">別ドメインの場合のみ遮断</option>
+				<option value="OFF">遮断しない</option>
+			</select>
+			<input type="submit" value="追加" />
+		</form>
+		<footer>
+			例外設定はドメインで設定して下さい。<br />
+			オプションの変更は、変更後に読み込まれたページから有効になります。
+		</footer>
+	</body>
+</html>
