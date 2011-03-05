@@ -1,24 +1,24 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title></title>
-		<script>
-(function(){
-	var config_data = "config" in localStorage ? JSON.parse(localStorage.config) : {global : "ALL", site : {}};
-	
-	chrome.extension.onRequest.addListener(function(req, sender, callback){
-		switch(req.type){
-			case "GET_CONFIG":
-				callback(config_data);
-			break;
-			case "UPDATE_CONFIG":
-				config_data = req.config;
-				localStorage.config = JSON.stringify(config_data);
-			break;
-		}
-	});
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script>
+(function() {
+  var config_data = 'config' in localStorage ? JSON.parse(localStorage.config) : {global: 'ALL', site: {}};
+
+  chrome.extension.onRequest.addListener(function(req, sender, callback) {
+    switch (req.type) {
+      case 'GET_CONFIG':
+        callback(config_data);
+      break;
+      case 'UPDATE_CONFIG':
+        config_data = req.config;
+        localStorage.config = JSON.stringify(config_data);
+      break;
+    }
+  });
 })();
-		</script>
-	</head>
+    </script>
+  </head>
 </html>
