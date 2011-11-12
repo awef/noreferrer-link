@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>test</title>
+		<style>
+h2 {
+	margin: 0;
+	font-size: medium;
+}
+iframe {
+	display: block;
+	width: 100%;
+	min-height: 400px;
+}
+/*
+#test a:not([rel~=noreferrer]):before {
+	content: "failed";
+	background-color: red;
+	color: #fff;
+}
+#test a[rel~=noreferrer]:before {
+	content: "ok";
+	background-color: green;
+	color: #fff;
+}
+*/
+		</style>
+	</head>
+	<body>
+		<script>document.write("document.referrer = \"" + document.referrer + "\"");</script>
+		<div id="test">
+			<div>
+				<h2>内部リンク</h2>
+				<a href="">""</a><br />
+				<a href="test.html">test.html</a><br />
+				<a href="test.html" rel="">test.html</a><br />
+				<a href="test.html" rel="nofollow">test.html</a><br />
+				<a href="test.html" rel="noreferrernofollow">test.html</a><br />
+				<a href="test.html" rel="noreferrer">test.html (noreferrer)</a><br />
+				<a href="test.html" rel="noreferrer nofollow">test.html (noreferrer)</a><br />
+			</div>
+			<div>
+				<h2>外部ドメイン</h2>
+				<a href="http://example.com/">http://example.com/</a><br />
+				<a href="http://example.com/" rel="">http://example.com/</a><br />
+				<a href="http://example.com/" rel="nofollow">http://example.com/</a><br />
+				<a href="http://example.com/" rel="noreferrernofollow">http://example.com/</a><br />
+				<a href="http://example.com/" rel="noreferrer">http://example.com/ (noreferrer)</a><br />
+				<a href="http://example.com/" rel="noreferrer nofollow">http://example.com/ (noreferrer)</a><br />
+			</div>
+			<div id="jstest">
+				<h2>スクリプトで生成されたリンク</h2>
+				<script>
+					document.write('<a href="http://example.com/">http://example.com/</a><br />');
+					document.write('<a href="test.html">test.html</a><br />');
+					
+					(function(){
+						var hoge = function(url){
+							var container = document.getElementById("jstest");
+							
+							var a = document.createElement("a");
+							a.href = url;
+							a.innerText = url;
+							container.appendChild(a);
+							container.appendChild(document.createElement("br"));
+						};
+						
+						hoge("http://example.com/");
+						hoge("test.html");
+						
+						setTimeout(function(){
+							hoge("http://example.com/");
+							hoge("test.html");
+						}, 1000);
+					})();
+				</script>
+			</div>
+			<script>
+				if(frameElement === undefined){
+					document.write("<div>");
+					document.write("<h2>フレーム</h2>");
+					document.write('<iframe src="test.html"></iframe>');
+					document.write("</div>");
+				}
+			</script>
+		</div>
+	</body>
+</html>
